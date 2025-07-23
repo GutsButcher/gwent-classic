@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gwent-game
+  labels:
+    app: gwent-game
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gwent-game
+  template:
+    metadata:
+      labels:
+        app: gwent-game
+    spec:
+      containers:
+      - name: gwent-game
+        image: gwynbliedd/gwent-game:v0.1
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+          limits:
+            memory: "128Mi"
+            cpu: "100m"
