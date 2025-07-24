@@ -1,0 +1,5 @@
+2025/07/25 01:51:32 Server starting on port 8080
+2025/07/25 01:51:40 Parsed challenge request: name=gwynbliedd, id=3
+2025/07/25 01:51:40 Checking user existence: name=gwynbliedd, id=3, exists=true, err=<nil>
+2025/07/25 01:58:16 Parsed challenge request: name=gwynbliedd2, id=5
+2025/07/25 01:58:16 Checking user existence: name=gwynbliedd2, id=5, exists=true, err=<nil>

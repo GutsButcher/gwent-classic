@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gwent Classic - Login</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #1a1a1a;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-image: url('img/bg.jpg');
+            background-size: cover;
+            background-position: center;
+        }
+
+        .auth-container {
+            background-color: rgba(0, 0, 0, 0.9);
+            border: 2px solid #8B4513;
+            border-radius: 10px;
+            padding: 40px;
+            width: 400px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .auth-container h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #D4AF37;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #D4AF37;
+            font-weight: bold;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            background-color: #2a2a2a;
+            border: 1px solid #8B4513;
+            border-radius: 5px;
+            color: #fff;
+            font-size: 16px;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #D4AF37;
+            box-shadow: 0 0 5px rgba(212, 175, 55, 0.3);
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #8B4513;
+            border: none;
+            border-radius: 5px;
+            color: #fff;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #A0522D;
+        }
+
+        .toggle-form {
+            text-align: center;
+            margin-top: 20px;
+            color: #D4AF37;
+        }
+
+        .toggle-form a {
+            color: #D4AF37;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .toggle-form a:hover {
+            text-decoration: underline;
+        }
+
+        .error-message {
+            background-color: #8B0000;
+            color: #fff;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .success-message {
+            background-color: #228B22;
+            color: #fff;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <h1 id="form-title">Login to Gwent Classic</h1>
+        
+        <div id="error-message" class="error-message"></div>
+        <div id="success-message" class="success-message"></div>
+        
+        <form id="auth-form">
+            <div class="form-group" id="name-group" style="display: none;">
+                <label for="name">Username</label>
+                <input type="text" id="name" name="name" placeholder="Choose your username">
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required placeholder="Enter your email">
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required placeholder="Enter your password">
+            </div>
+            
+            <button type="submit" id="submit-btn">Login</button>
+        </form>
+        
+        <div class="toggle-form">
+            <span id="toggle-text">Don't have an account?</span>
+            <a href="#" id="toggle-link">Register</a>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8080/api';
+        let isLoginMode = true;
+
+        const formTitle = document.getElementById('form-title');
+        const authForm = document.getElementById('auth-form');
+        const submitBtn = document.getElementById('submit-btn');
+        const toggleText = document.getElementById('toggle-text');
+        const toggleLink = document.getElementById('toggle-link');
+        const nameGroup = document.getElementById('name-group');
+        const errorMessage = document.getElementById('error-message');
+        const successMessage = document.getElementById('success-message');
+
+        toggleLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            isLoginMode = !isLoginMode;
+            
+            if (isLoginMode) {
+                formTitle.textContent = 'Login to Gwent Classic';
+                submitBtn.textContent = 'Login';
+                toggleText.textContent = "Don't have an account?";
+                toggleLink.textContent = 'Register';
+                nameGroup.style.display = 'none';
+            } else {
+                formTitle.textContent = 'Register for Gwent Classic';
+                submitBtn.textContent = 'Register';
+                toggleText.textContent = 'Already have an account?';
+                toggleLink.textContent = 'Login';
+                nameGroup.style.display = 'block';
+            }
+            
+            errorMessage.style.display = 'none';
+            successMessage.style.display = 'none';
+            authForm.reset();
+        });
+
+        authForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            errorMessage.style.display = 'none';
+            successMessage.style.display = 'none';
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const name = document.getElementById('name').value;
+            
+            const endpoint = isLoginMode ? '/auth/login' : '/auth/register';
+            const body = isLoginMode ? { email, password } : { email, name, password };
+            
+            try {
+                const response = await fetch(API_URL + endpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(body)
+                });
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(errorText || 'Authentication failed');
+                }
+                
+                const data = await response.json();
+                
+                // Store auth data
+                localStorage.setItem('gwent_token', data.token);
+                localStorage.setItem('gwent_user', JSON.stringify(data.user));
+                
+                successMessage.textContent = isLoginMode ? 'Login successful! Redirecting...' : 'Registration successful! Redirecting...';
+                successMessage.style.display = 'block';
+                
+                // Redirect to menu
+                setTimeout(() => {
+                    window.location.href = 'menu.html';
+                }, 1500);
+                
+            } catch (error) {
+                errorMessage.textContent = error.message;
+                errorMessage.style.display = 'block';
+            }
+        });
+
+        // Check if already logged in
+        if (localStorage.getItem('gwent_token')) {
+            window.location.href = 'menu.html';
+        }
+    </script>
+</body>
+</html>

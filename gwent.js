@@ -2671,11 +2671,18 @@ function onYouTubeIframeAPIReady() {
 
 /*----------------------------------------------------*/
 
+// Check authentication before initializing game
+if (!window.gwentAPI || !window.gwentAPI.isAuthenticated()) {
+    window.location.href = 'auth.html';
+}
+
 var ui = new UI();
 var board = new Board();
 var weather = new Weather();
 var game = new Game();
 var player_me, player_op;
+var isMultiplayer = false;
+var currentGameId = null;
 
 ui.enablePlayer(false);
 let dm = new DeckMaker();

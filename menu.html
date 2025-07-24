@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gwent Classic - Game Menu</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #1a1a1a;
+            color: #fff;
+            min-height: 100vh;
+            background-image: url('img/bg.jpg');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background-color: rgba(0, 0, 0, 0.8);
+            border-bottom: 2px solid #8B4513;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .user-info span {
+            color: #D4AF37;
+            font-weight: bold;
+        }
+
+        .logout-btn {
+            background-color: #8B4513;
+            border: none;
+            padding: 10px 20px;
+            color: #fff;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .logout-btn:hover {
+            background-color: #A0522D;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+        }
+
+        .menu-container {
+            background-color: rgba(0, 0, 0, 0.9);
+            border: 2px solid #8B4513;
+            border-radius: 10px;
+            padding: 40px;
+            max-width: 800px;
+            width: 100%;
+        }
+
+        .menu-title {
+            text-align: center;
+            color: #D4AF37;
+            font-size: 36px;
+            margin-bottom: 40px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .menu-option {
+            background-color: #2a2a2a;
+            border: 2px solid #8B4513;
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .menu-option:hover {
+            background-color: #3a3a3a;
+            border-color: #D4AF37;
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .menu-option h2 {
+            color: #D4AF37;
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+
+        .menu-option p {
+            color: #ccc;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+
+        .challenges-section {
+            background-color: #2a2a2a;
+            border: 2px solid #8B4513;
+            border-radius: 10px;
+            padding: 30px;
+            margin-top: 30px;
+        }
+
+        .challenges-section h3 {
+            color: #D4AF37;
+            margin-bottom: 20px;
+        }
+
+        .challenge-item {
+            background-color: #1a1a1a;
+            border: 1px solid #8B4513;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .challenge-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-accept {
+            background-color: #228B22;
+            border: none;
+            padding: 8px 16px;
+            color: #fff;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn-decline {
+            background-color: #8B0000;
+            border: none;
+            padding: 8px 16px;
+            color: #fff;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .challenge-form {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .challenge-form input {
+            flex: 1;
+            padding: 10px;
+            background-color: #1a1a1a;
+            border: 1px solid #8B4513;
+            border-radius: 5px;
+            color: #fff;
+        }
+
+        .challenge-form button {
+            background-color: #8B4513;
+            border: none;
+            padding: 10px 20px;
+            color: #fff;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .active-games {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #1a1a1a;
+            border: 1px solid #8B4513;
+            border-radius: 5px;
+        }
+
+        .game-item {
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: #2a2a2a;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .game-item:hover {
+            background-color: #3a3a3a;
+        }
+
+        .message {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 5px;
+            display: none;
+            z-index: 1000;
+        }
+
+        .message.error {
+            background-color: #8B0000;
+        }
+
+        .message.success {
+            background-color: #228B22;
+        }
+    </style>
+    <script src="api.js"></script>
+</head>
+<body>
+    <div class="header">
+        <h1 style="color: #D4AF37;">Gwent Classic</h1>
+        <div class="user-info">
+            <span id="username"></span>
+            <button class="logout-btn" onclick="gwentAPI.logout()">Logout</button>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="menu-container">
+            <h1 class="menu-title">Choose Game Mode</h1>
+            
+            <div class="menu-grid">
+                <div class="menu-option" onclick="startAIGame()">
+                    <h2>Challenge AI</h2>
+                    <p>Play against the computer opponent. Practice your skills and strategies.</p>
+                </div>
+                
+                <div class="menu-option" onclick="toggleMultiplayer()">
+                    <h2>Multiplayer</h2>
+                    <p>Challenge other players online. Prove your worth in PvP battles.</p>
+                </div>
+            </div>
+
+            <div id="multiplayer-section" style="display: none;">
+                <div class="challenges-section">
+                    <h3>Challenge a Player</h3>
+                    <div class="challenge-form">
+                        <input type="text" id="challenge-input" placeholder="Enter player name#ID (e.g., Player#123)">
+                        <button onclick="sendChallenge()">Send Challenge</button>
+                    </div>
+                </div>
+
+                <div class="challenges-section">
+                    <h3>Pending Challenges</h3>
+                    <div id="challenges-list"></div>
+                </div>
+
+                <div class="challenges-section">
+                    <h3>Active Games</h3>
+                    <div id="active-games"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="message" class="message"></div>
+
+    <script>
+        if (!gwentAPI.isAuthenticated()) {
+            window.location.href = 'auth.html';
+        }
+
+        // Display username
+        document.getElementById('username').textContent = `${gwentAPI.user.name}#${gwentAPI.user.id}`;
+
+        let multiplayerVisible = false;
+
+        function showMessage(text, type = 'error') {
+            const msg = document.getElementById('message');
+            msg.textContent = text;
+            msg.className = `message ${type}`;
+            msg.style.display = 'block';
+            setTimeout(() => msg.style.display = 'none', 3000);
+        }
+
+        async function startAIGame() {
+            try {
+                const game = await gwentAPI.createAIGame();
+                localStorage.setItem('gwent_game_mode', 'ai');
+                localStorage.setItem('gwent_game_id', game.game_id);
+                window.location.href = 'index.html';
+            } catch (error) {
+                showMessage('Failed to create AI game', 'error');
+            }
+        }
+
+        function toggleMultiplayer() {
+            multiplayerVisible = !multiplayerVisible;
+            document.getElementById('multiplayer-section').style.display = multiplayerVisible ? 'block' : 'none';
+            if (multiplayerVisible) {
+                loadChallenges();
+                loadActiveGames();
+            }
+        }
+
+        async function sendChallenge() {
+            const input = document.getElementById('challenge-input');
+            const nameID = input.value.trim();
+            
+            if (!nameID || !nameID.includes('#')) {
+                showMessage('Invalid format. Use name#ID', 'error');
+                return;
+            }
+
+            try {
+                await gwentAPI.createChallenge(nameID);
+                showMessage('Challenge sent!', 'success');
+                input.value = '';
+                loadChallenges();
+            } catch (error) {
+                showMessage('Failed to send challenge', 'error');
+            }
+        }
+
+        async function loadChallenges() {
+            try {
+                const challenges = await gwentAPI.getChallenges();
+                const container = document.getElementById('challenges-list');
+                
+                if (challenges.length === 0) {
+                    container.innerHTML = '<p style="color: #666;">No pending challenges</p>';
+                    return;
+                }
+
+                container.innerHTML = challenges.map(ch => `
+                    <div class="challenge-item">
+                        <div>
+                            ${ch.is_challenger ? 
+                                `Waiting for ${ch.challenged.name}#${ch.challenged.id} to respond` :
+                                `Challenge from ${ch.challenger.name}#${ch.challenger.id}`
+                            }
+                        </div>
+                        ${!ch.is_challenger ? `
+                            <div class="challenge-buttons">
+                                <button class="btn-accept" onclick="respondChallenge(${ch.id}, true)">Accept</button>
+                                <button class="btn-decline" onclick="respondChallenge(${ch.id}, false)">Decline</button>
+                            </div>
+                        ` : ''}
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Failed to load challenges:', error);
+            }
+        }
+
+        async function respondChallenge(challengeId, accept) {
+            try {
+                const response = await gwentAPI.respondToChallenge(challengeId, accept);
+                if (accept && response.game_id) {
+                    localStorage.setItem('gwent_game_mode', 'multiplayer');
+                    localStorage.setItem('gwent_game_id', response.game_id);
+                    window.location.href = 'index.html';
+                } else {
+                    showMessage(accept ? 'Challenge accepted!' : 'Challenge declined', 'success');
+                    loadChallenges();
+                }
+            } catch (error) {
+                showMessage('Failed to respond to challenge', 'error');
+            }
+        }
+
+        async function loadActiveGames() {
+            try {
+                const games = await gwentAPI.getActiveGames();
+                const container = document.getElementById('active-games');
+                
+                if (games.length === 0) {
+                    container.innerHTML = '<p style="color: #666;">No active games</p>';
+                    return;
+                }
+
+                container.innerHTML = games.map(g => `
+                    <div class="game-item" onclick="continueGame(${g.id})">
+                        Game vs ${g.player2 ? `${g.player2.name}#${g.player2.id}` : 'AI'} - 
+                        Started ${new Date(g.created_at).toLocaleString()}
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Failed to load active games:', error);
+            }
+        }
+
+        function continueGame(gameId) {
+            localStorage.setItem('gwent_game_mode', 'multiplayer');
+            localStorage.setItem('gwent_game_id', gameId);
+            window.location.href = 'index.html';
+        }
+
+        // Refresh challenges periodically
+        if (multiplayerVisible) {
+            setInterval(() => {
+                if (multiplayerVisible) {
+                    loadChallenges();
+                    loadActiveGames();
+                }
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
